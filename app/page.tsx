@@ -1,28 +1,29 @@
 export const dynamic = 'force-dynamic'
 
 import { Suspense } from 'react'
-import { db } from '@/lib/db'
-import { products, platforms } from '@/drizzle/schema'
-import { eq } from 'drizzle-orm'
+import { supabase } from '@/lib/supabase'
 import { ProductGrid } from '@/components/shared/ProductGrid'
 import { ProductGridSkeleton } from '@/components/shared/ProductCardSkeleton'
 
 async function ProductsSection() {
-  const rows = await db
-    .select({
-      id: products.id,
-      name: products.name,
-      description: products.description,
-      price: products.price,
-      imageUrl: products.imageUrl,
-      affiliateLink: products.affiliateLink,
-      platform: platforms.name,
-    })
-    .from(products)
-    .leftJoin(platforms, eq(products.platformId, platforms.id))
-    .orderBy(products.createdAt)
+  const { data, error } = await supabase
+    .from('products')
+    .select('id, name, description, price, image_url, affiliate_link, platforms(name)')
+    .order('created_at', { ascending: false })
 
-  return <ProductGrid products={rows} />
+  if (error) throw new Error(error.message)
+
+  const products = (data ?? []).map((p: any) => ({
+    id: p.id,
+    name: p.name,
+    description: p.description,
+    price: p.price,
+    imageUrl: p.image_url,
+    affiliateLink: p.affiliate_link,
+    platform: p.platforms?.name ?? null,
+  }))
+
+  return <ProductGrid products={products} />
 }
 
 export default function HomePage() {

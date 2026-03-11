@@ -1,28 +1,18 @@
-import { db } from '@/lib/db'
-import { products, clicks } from '@/drizzle/schema'
-import { sql } from 'drizzle-orm'
+export const dynamic = 'force-dynamic'
+
+import { supabase } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Package, MousePointerClick } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
-
 export default async function AdminPage() {
-  const [productCount, clickCount] = await Promise.all([
-    db.select({ count: sql<number>`count(*)` }).from(products),
-    db.select({ count: sql<number>`count(*)` }).from(clicks),
+  const [{ count: productCount }, { count: clickCount }] = await Promise.all([
+    supabase.from('products').select('*', { count: 'exact', head: true }),
+    supabase.from('clicks').select('*', { count: 'exact', head: true }),
   ])
 
   const stats = [
-    {
-      title: 'Total de Produtos',
-      value: productCount[0].count,
-      icon: Package,
-    },
-    {
-      title: 'Total de Cliques',
-      value: clickCount[0].count,
-      icon: MousePointerClick,
-    },
+    { title: 'Total de Produtos', value: productCount ?? 0, icon: Package },
+    { title: 'Total de Cliques', value: clickCount ?? 0, icon: MousePointerClick },
   ]
 
   return (

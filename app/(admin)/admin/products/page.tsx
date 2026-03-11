@@ -1,29 +1,20 @@
+export const dynamic = 'force-dynamic'
+
 import Link from 'next/link'
-import { db } from '@/lib/db'
-import { products, platforms } from '@/drizzle/schema'
-import { eq } from 'drizzle-orm'
+import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from '@/components/ui/table'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { deleteProduct } from '@/lib/actions'
 import { Plus, Trash2, ExternalLink } from 'lucide-react'
 
-export const dynamic = 'force-dynamic'
-
 export default async function AdminProductsPage() {
-  const rows = await db
-    .select({
-      id: products.id,
-      name: products.name,
-      price: products.price,
-      affiliateLink: products.affiliateLink,
-      platform: platforms.name,
-    })
-    .from(products)
-    .leftJoin(platforms, eq(products.platformId, platforms.id))
-    .orderBy(products.createdAt)
+  const { data } = await supabase
+    .from('products')
+    .select('id, name, price, affiliate_link, platforms(name)')
+    .order('created_at', { ascending: false })
+
+  const rows = data ?? []
 
   return (
     <div className="space-y-6">
@@ -53,11 +44,11 @@ export default async function AdminProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {rows.map((p) => (
+            {rows.map((p: any) => (
               <TableRow key={p.id}>
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell>
-                  {p.platform ? <Badge variant="secondary">{p.platform}</Badge> : '—'}
+                  {p.platforms?.name ? <Badge variant="secondary">{p.platforms.name}</Badge> : '—'}
                 </TableCell>
                 <TableCell>
                   {p.price
@@ -65,12 +56,8 @@ export default async function AdminProductsPage() {
                     : '—'}
                 </TableCell>
                 <TableCell>
-                  <a
-                    href={p.affiliateLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline"
-                  >
+                  <a href={p.affiliate_link} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline">
                     Ver <ExternalLink className="h-3 w-3" />
                   </a>
                 </TableCell>
