@@ -1,7 +1,5 @@
 import Image from 'next/image'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { ExternalLink } from 'lucide-react'
 
 type Product = {
   id: number
@@ -14,46 +12,62 @@ type Product = {
 }
 
 export function ProductCard({ product }: { product: Product }) {
+  const formattedPrice = product.price
+    ? Number(product.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    : null
+
   return (
-    <Card className="flex flex-col overflow-hidden">
-      <div className="relative aspect-square bg-muted">
+    <a
+      href={product.affiliateLink}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group flex flex-col rounded-2xl overflow-hidden bg-white border border-border/60 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+    >
+      {/* Imagem */}
+      <div className="relative aspect-square overflow-hidden bg-muted">
         {product.imageUrl ? (
           <Image
             src={product.imageUrl}
             alt={product.name}
             fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-muted-foreground text-sm">
-            Sem imagem
+          <div className="flex h-full items-center justify-center">
+            <span className="text-4xl">🛍️</span>
+          </div>
+        )}
+        {product.platform && (
+          <div className="absolute top-2 left-2">
+            <span className="rounded-full bg-white/90 px-2.5 py-0.5 text-xs font-semibold text-foreground shadow-sm backdrop-blur-sm">
+              {product.platform}
+            </span>
           </div>
         )}
       </div>
-      <CardContent className="flex-1 p-4">
-        {product.platform && (
-          <Badge variant="secondary" className="mb-2">
-            {product.platform}
-          </Badge>
-        )}
-        <h3 className="font-semibold leading-tight line-clamp-2">{product.name}</h3>
+
+      {/* Conteúdo */}
+      <div className="flex flex-1 flex-col gap-2 p-4">
+        <h3 className="text-sm font-semibold leading-snug line-clamp-2 text-foreground">
+          {product.name}
+        </h3>
         {product.description && (
-          <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{product.description}</p>
-        )}
-        {product.price && (
-          <p className="mt-2 text-lg font-bold">
-            {Number(product.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+            {product.description}
           </p>
         )}
-      </CardContent>
-      <CardFooter className="p-4 pt-0">
-        <Button asChild className="w-full">
-          <a href={product.affiliateLink} target="_blank" rel="noopener noreferrer">
-            Ver oferta
-          </a>
-        </Button>
-      </CardFooter>
-    </Card>
+        <div className="mt-auto flex items-center justify-between pt-2">
+          {formattedPrice ? (
+            <span className="text-lg font-bold text-primary">{formattedPrice}</span>
+          ) : (
+            <span className="text-sm text-muted-foreground">Ver preço</span>
+          )}
+          <span className="flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+            Ver oferta <ExternalLink className="h-3 w-3" />
+          </span>
+        </div>
+      </div>
+    </a>
   )
 }

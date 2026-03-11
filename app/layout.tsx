@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${geistSans.variable} antialiased bg-background text-foreground`}>
         <Header />
-        <main className="mx-auto max-w-7xl px-4 py-8">
+        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
           {children}
         </main>
       </body>
