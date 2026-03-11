@@ -19,6 +19,7 @@ export const products = pgTable('products', {
   imageUrl: text('image_url'),
   affiliateLink: text('affiliate_link').notNull(),
   platformId: integer('platform_id').references(() => platforms.id),
+  category: text('category'),
   createdAt: timestamp('created_at').defaultNow(),
 })
 

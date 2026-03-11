@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { Search, Menu, X, ShoppingBag } from 'lucide-react'
+import { useState, Suspense } from 'react'
+import { Menu, X, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { HeaderSearchForm } from '@/components/shared/HeaderSearchForm'
 
 export function Header() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -22,14 +23,9 @@ export function Header() {
 
         {/* Search bar — centro */}
         <div className="flex flex-1 items-center justify-center px-2 sm:px-6">
-          <div className="relative w-full max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Buscar produtos..."
-              className="w-full rounded-full border border-border bg-muted/50 py-2 pl-9 pr-4 text-sm outline-none transition focus:border-primary focus:bg-white focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
+          <Suspense fallback={null}>
+            <HeaderSearchForm />
+          </Suspense>
         </div>
 
         {/* Nav desktop */}
